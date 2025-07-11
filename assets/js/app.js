@@ -3,7 +3,7 @@ const sendBtn = document.getElementById("sendBtn");
 const status = document.getElementById("status");
 const output = document.getElementById("output");
 
-const peer = new SimplePeer({ initiator: location.hash === "#1", trickle: false });
+const peer = new SimplePeer({ initiator: location.hash === "/#1", trickle: false });
 
 peer.on("signal", data => {
   output.textContent = JSON.stringify(data);
