@@ -1,28 +1,28 @@
-// Get all required elements
 const fileInput = document.getElementById("fileInput");
 const sendBtn = document.getElementById("sendBtn");
 const status = document.getElementById("status");
 const output = document.getElementById("output");
+const signalBox = document.getElementById("signalBox");
+const connectBtn = document.getElementById("connectBtn");
 
-// Create a SimplePeer connection
+// Create Peer
 const peer = new SimplePeer({
-  initiator: location.hash === "#1", // Only initiator when URL has #1
+  initiator: location.hash === "#1",
   trickle: false
 });
 
-// When signal data is generated (only on sender side), show it
+// Generate and show signal code
 peer.on("signal", data => {
-  const signalJSON = JSON.stringify(data);
-  output.textContent = signalJSON;
-  status.textContent = "📋 Copy the above code and paste it in other device.";
+  output.textContent = JSON.stringify(data);
+  status.textContent = "📋 Copy this code and paste on other device.";
 });
 
-// When connection is established
+// On connection
 peer.on("connect", () => {
   status.textContent = "✅ Connected! Now you can send a file.";
 });
 
-// When data (file) is received
+// Receive file
 peer.on("data", data => {
   const blob = new Blob([data]);
   const link = document.createElement("a");
@@ -32,7 +32,7 @@ peer.on("data", data => {
   status.textContent = "📥 File received and downloaded.";
 });
 
-// When Send button is clicked
+// Send file
 sendBtn.addEventListener("click", () => {
   const file = fileInput.files[0];
   if (!file) {
@@ -48,14 +48,13 @@ sendBtn.addEventListener("click", () => {
   reader.readAsArrayBuffer(file);
 });
 
-// Listen for paste event to receive signal JSON
-window.addEventListener("paste", event => {
+// Manual Connect button (for mobile)
+connectBtn.addEventListener("click", () => {
   try {
-    const pasteData = event.clipboardData.getData("text");
-    const signalData = JSON.parse(pasteData);
+    const signalData = JSON.parse(signalBox.value.trim());
     peer.signal(signalData);
     status.textContent = "🔐 Signal received. Connecting...";
-  } catch (err) {
-    status.textContent = "❌ Invalid signal code pasted.";
+  } catch {
+    status.textContent = "❌ Invalid code. Please check again.";
   }
 });
